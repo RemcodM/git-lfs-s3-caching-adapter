@@ -55,12 +55,10 @@ func GetCachingConfiguration(cfg *config.Configuration) *cachingConfiguration {
 		scopes = append(scopes, fmt.Sprintf(".%s", *cachingConfiguration.Scope))
 	}
 	for _, scope := range scopes {
+		fmt.Fprintf(os.Stderr, "Reading additional configuration values from gitconfig in scope 'lfscache%s'\n", scope)
 		if cachingConfiguration.Bucket == nil {
 			if value, ok := cfg.Git.Get(fmt.Sprintf("lfscache%s.bucket", scope)); ok {
 				cachingConfiguration.Bucket = &value
-			} else {
-				fmt.Fprintf(os.Stderr, "No bucket specified. Will not use caching\n")
-				return nil
 			}
 		}
 		if cachingConfiguration.ConfigurationFiles == nil {
