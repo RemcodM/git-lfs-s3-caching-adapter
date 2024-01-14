@@ -21,6 +21,7 @@ type cachingConfiguration struct {
 	Prefix             *string  `json:"prefix,omitempty"`
 	Profile            *string  `json:"profile,omitempty"`
 	Region             *string  `json:"region,omitempty"`
+	Scope              *string  `json:"scope,omitempty"`
 	UsePathStyle       *bool    `json:"usePathStyle,omitempty"`
 }
 
@@ -43,47 +44,59 @@ func GetCachingConfiguration(cfg *config.Configuration) *cachingConfiguration {
 		fmt.Fprintf(os.Stderr, "Error while checking existance of .lfsconfig.json. Will ignore its values\n")
 	}
 
-	if cachingConfiguration.Bucket == nil {
-		if value, ok := cfg.Git.Get("lfscache.bucket"); ok {
-			cachingConfiguration.Bucket = &value
-		} else {
-			fmt.Fprintf(os.Stderr, "No bucket specified. Will not use caching\n")
-			return nil
+	if cachingConfiguration.Scope == nil {
+		if value, ok := cfg.Git.Get("lfscache.scope"); ok {
+			cachingConfiguration.Scope = &value
 		}
 	}
-	if cachingConfiguration.ConfigurationFiles == nil {
-		if values := cfg.Git.GetAll("lfscache.configFile"); len(values) > 0 {
-			cachingConfiguration.ConfigurationFiles = append(cachingConfiguration.ConfigurationFiles, values...)
-		}
+
+	scopes := []string{""}
+	if cachingConfiguration.Scope != nil {
+		scopes = append(scopes, fmt.Sprintf(".%s", *cachingConfiguration.Scope))
 	}
-	if cachingConfiguration.CredentialsFiles == nil {
-		if values := cfg.Git.GetAll("lfscache.credentialsFile"); len(values) > 0 {
-			cachingConfiguration.CredentialsFiles = append(cachingConfiguration.CredentialsFiles, values...)
+	for _, scope := range scopes {
+		if cachingConfiguration.Bucket == nil {
+			if value, ok := cfg.Git.Get(fmt.Sprintf("lfscache%s.bucket", scope)); ok {
+				cachingConfiguration.Bucket = &value
+			} else {
+				fmt.Fprintf(os.Stderr, "No bucket specified. Will not use caching\n")
+				return nil
+			}
 		}
-	}
-	if cachingConfiguration.Endpoint == nil {
-		if value, ok := cfg.Git.Get("lfscache.endpoint"); ok {
-			cachingConfiguration.Endpoint = &value
+		if cachingConfiguration.ConfigurationFiles == nil {
+			if values := cfg.Git.GetAll(fmt.Sprintf("lfscache%s.configFile", scope)); len(values) > 0 {
+				cachingConfiguration.ConfigurationFiles = append(cachingConfiguration.ConfigurationFiles, values...)
+			}
 		}
-	}
-	if cachingConfiguration.Prefix == nil {
-		if value, ok := cfg.Git.Get("lfscache.prefix"); ok {
-			cachingConfiguration.Prefix = &value
+		if cachingConfiguration.CredentialsFiles == nil {
+			if values := cfg.Git.GetAll(fmt.Sprintf("lfscache%s.credentialsFile", scope)); len(values) > 0 {
+				cachingConfiguration.CredentialsFiles = append(cachingConfiguration.CredentialsFiles, values...)
+			}
 		}
-	}
-	if cachingConfiguration.Profile == nil {
-		if value, ok := cfg.Git.Get("lfscache.profile"); ok {
-			cachingConfiguration.Profile = &value
+		if cachingConfiguration.Endpoint == nil {
+			if value, ok := cfg.Git.Get(fmt.Sprintf("lfscache%s.endpoint", scope)); ok {
+				cachingConfiguration.Endpoint = &value
+			}
 		}
-	}
-	if cachingConfiguration.Region == nil {
-		if value, ok := cfg.Git.Get("lfscache.region"); ok {
-			cachingConfiguration.Region = &value
+		if cachingConfiguration.Prefix == nil {
+			if value, ok := cfg.Git.Get(fmt.Sprintf("lfscache%s.prefix", scope)); ok {
+				cachingConfiguration.Prefix = &value
+			}
 		}
-	}
-	if cachingConfiguration.UsePathStyle == nil {
-		usePathStyle := cfg.Git.Bool("lfscache.usePathStyle", false)
-		cachingConfiguration.UsePathStyle = &usePathStyle
+		if cachingConfiguration.Profile == nil {
+			if value, ok := cfg.Git.Get(fmt.Sprintf("lfscache%s.profile", scope)); ok {
+				cachingConfiguration.Profile = &value
+			}
+		}
+		if cachingConfiguration.Region == nil {
+			if value, ok := cfg.Git.Get(fmt.Sprintf("lfscache%s.region", scope)); ok {
+				cachingConfiguration.Region = &value
+			}
+		}
+		if cachingConfiguration.UsePathStyle == nil {
+			usePathStyle := cfg.Git.Bool(fmt.Sprintf("lfscache%s.usePathStyle", scope), false)
+			cachingConfiguration.UsePathStyle = &usePathStyle
+		}
 	}
 
 	return cachingConfiguration
