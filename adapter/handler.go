@@ -9,8 +9,8 @@ import (
 	"github.com/git-lfs/git-lfs/v3/lfsapi"
 	"github.com/git-lfs/git-lfs/v3/tq"
 
-	"heliumg.it/toolbox/git-lfs-s3-caching-adapter/caching"
-	"heliumg.it/toolbox/git-lfs-s3-caching-adapter/lfs"
+	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/caching"
+	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/lfs"
 )
 
 type cachingHandler struct {

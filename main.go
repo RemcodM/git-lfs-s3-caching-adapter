@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"heliumg.it/toolbox/git-lfs-s3-caching-adapter/adapter"
+	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/adapter"
 )
 
 func main() {

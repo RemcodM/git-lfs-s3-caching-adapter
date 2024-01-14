@@ -1,4 +1,4 @@
-module heliumg.it/toolbox/git-lfs-s3-caching-adapter
+module gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter
 
 go 1.21
 
