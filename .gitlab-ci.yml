@@ -11,6 +11,7 @@ build:darwin:amd64:
   artifacts:
     paths:
       - bin/darwin/amd64/git-lfs-s3-caching-adapter
+    expire_in: 2 hours
   rules:
     - if: $CI_COMMIT_TAG
       when: never
@@ -26,6 +27,7 @@ build:darwin:arm64:
   artifacts:
     paths:
       - bin/darwin/arm64/git-lfs-s3-caching-adapter
+    expire_in: 2 hours
   rules:
     - if: $CI_COMMIT_TAG
       when: never
@@ -41,6 +43,7 @@ build:linux:amd64:
   artifacts:
     paths:
       - bin/linux/amd64/git-lfs-s3-caching-adapter
+    expire_in: 2 hours
   rules:
     - if: $CI_COMMIT_TAG
       when: never
@@ -56,6 +59,7 @@ build:linux:arm64:
   artifacts:
     paths:
       - bin/linux/arm64/git-lfs-s3-caching-adapter
+    expire_in: 2 hours
   rules:
     - if: $CI_COMMIT_TAG
       when: never
