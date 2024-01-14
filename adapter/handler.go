@@ -76,14 +76,14 @@ func newHandler(output *os.File, msg *inputMessage) (*cachingHandler, error) {
 func (h *cachingHandler) dispatch(msg *inputMessage) bool {
 	switch msg.Event {
 	case "init":
-		fmt.Fprintf(os.Stderr, "Received initialization message\n", msg.Event)
+		fmt.Fprintf(os.Stderr, "Received initialization message\n")
 		fmt.Fprintln(h.output, "{}")
 	case "upload":
 		h.upload(msg.Oid, msg.Size, msg.Path)
 	case "download":
 		h.download(msg.Oid, msg.Size)
 	case "terminate":
-		fmt.Fprintf(os.Stderr, "Received call to terminate\n", msg.Event)
+		fmt.Fprintf(os.Stderr, "Received call to terminate\n")
 		h.terminate()
 		return false
 	default:
@@ -156,15 +156,17 @@ func (h *cachingHandler) download(oid string, size int64) {
 
 	if h.cacheAdapter != nil {
 		fmt.Fprintf(os.Stderr, "Trying to download object %s from cache, target: %s\n", oid, tmp.Name())
-		err := h.cacheAdapter.Download(tmp.Name(), oid, size, func(bytesSoFar int64, bytesSinceLast int64) {
+		ok, err := h.cacheAdapter.Download(tmp.Name(), oid, size, func(bytesSoFar int64, bytesSinceLast int64) {
 			h.progress(oid, bytesSoFar, bytesSinceLast)
 		})
-		if err == nil {
+		if ok {
 			fmt.Fprintf(os.Stderr, "Downloaded object %s from cache to target %s\n", oid, tmp.Name())
 			h.complete(oid, tmp.Name(), err)
 			return
+		} else if err == nil {
+			fmt.Fprintf(os.Stderr, "Cache miss for object %s. Will download upstream instead.\n", oid)
 		} else {
-			fmt.Fprintf(os.Stderr, "Cache miss for object %s. %s Will download upstream instead. %s\n", oid, err.Error())
+			fmt.Fprintf(os.Stderr, "Cache error while obtaining object %s. %s Will download upstream instead.\n", oid, err.Error())
 		}
 	}
 

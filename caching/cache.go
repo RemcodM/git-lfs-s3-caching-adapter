@@ -23,7 +23,7 @@ type S3CachingAdapter struct {
 func NewS3CachingAdapter(cfg *config.Configuration) (*S3CachingAdapter, error) {
 	configuration := GetCachingConfiguration(cfg)
 	if !configuration.enabled() {
-		fmt.Fprintf(os.Stderr, "Found no caching configuration for this repository. Not caching anything.\n", configuration)
+		fmt.Fprintf(os.Stderr, "Found no caching configuration for this repository. Not caching anything.\n")
 		return nil, nil
 	}
 	jsonConfiguration, err := json.Marshal(configuration)
@@ -55,14 +55,14 @@ func (a *S3CachingAdapter) exists(ctx context.Context, oid string, size int64) (
 		return false, err
 	}
 	if *object.ContentLength != size {
-		return false, errors.New(fmt.Sprintf("object size mismatch: expected %d, got %d", size, *object.ContentLength))
+		return false, fmt.Errorf("object size mismatch: expected %d, got %d", size, *object.ContentLength)
 	}
 	return true, nil
 }
 
-func (a *S3CachingAdapter) Download(dest string, oid string, size int64, progressCallback func(bytesSoFar int64, bytesSinceLast int64)) error {
+func (a *S3CachingAdapter) Download(dest string, oid string, size int64, progressCallback func(bytesSoFar int64, bytesSinceLast int64)) (bool, error) {
 	if ok, err := a.exists(context.Background(), oid, size); !ok {
-		return err
+		return false, err
 	}
 
 	// Download the object from the S3 bucket
@@ -71,29 +71,29 @@ func (a *S3CachingAdapter) Download(dest string, oid string, size int64, progres
 		Key:    aws.String(fmt.Sprintf("%s/%s", *a.configuration.Prefix, oid)),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to download object: %v", err)
+		return false, fmt.Errorf("failed to download object: %v", err)
 	}
 	defer resp.Body.Close()
 
 	// Create the destination file
 	file, err := os.Create(dest)
 	if err != nil {
-		return fmt.Errorf("failed to create file: %v", err)
+		return false, fmt.Errorf("failed to create file: %v", err)
 	}
 	defer file.Close()
 
 	// Write resp.Body to the file with progress indicator
 	_, err = io.Copy(file, &progressReader{reader: resp.Body, progressCallback: progressCallback})
 	if err != nil {
-		return fmt.Errorf("failed to write to file: %v", err)
+		return false, fmt.Errorf("failed to write to file: %v", err)
 	}
 
-	return nil
+	return true, nil
 }
 
 func (a *S3CachingAdapter) Upload(source string, oid string, size int64, progressCallback func(bytesSoFar int64, bytesSinceLast int64)) error {
 	uploaded, err := a.exists(context.Background(), oid, size)
-	if uploaded {
+	if uploaded && err == nil {
 		return nil
 	}
 
