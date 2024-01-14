@@ -1,0 +1,38 @@
+stages:
+  - build
+
+build:linux:amd64:
+  stage: build
+  image: golang:1.21-alpine
+  script:
+    - GOOS=linux GOARCH=amd64 go build -o ./bin/linux/amd64/lfscaching
+  artifacts:
+    paths:
+      - bin/linux/amd64/lfscaching
+
+build:linux:arm64:
+  stage: build
+  image: golang:1.21-alpine
+  script:
+    - GOOS=linux GOARCH=arm64 go build -o ./bin/linux/arm64/lfscaching
+  artifacts:
+    paths:
+      - bin/linux/arm64/lfscaching
+
+build:macos:amd64:
+  stage: build
+  image: golang:1.21-alpine
+  script:
+    - GOOS=darwin GOARCH=amd64 go build -o ./bin/macos/amd64/lfscaching
+  artifacts:
+    paths:
+      - bin/macos/amd64/lfscaching
+
+build:macos:arm64:
+  stage: build
+  image: golang:1.21-alpine
+  script:
+    - GOOS=darwin GOARCH=arm64 go build -o ./bin/macos/arm64/lfscaching
+  artifacts:
+    paths:
+      - bin/macos/arm64/lfscaching
