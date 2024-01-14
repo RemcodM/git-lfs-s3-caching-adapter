@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go/logging"
 	"github.com/git-lfs/git-lfs/v3/config"
 )
 
@@ -92,7 +94,10 @@ func (c *cachingConfiguration) enabled() bool {
 }
 
 func (c *cachingConfiguration) newClient() (*s3.Client, error) {
-	opts := []func(*awsconfig.LoadOptions) error{}
+	opts := []func(*awsconfig.LoadOptions) error{
+		awsconfig.WithLogger(logging.NewStandardLogger(os.Stderr)),
+		awsconfig.WithClientLogMode(aws.LogRequest | aws.LogResponse),
+	}
 	if len(c.ConfigurationFiles) > 0 {
 		opts = append(opts, awsconfig.WithSharedConfigFiles(c.ConfigurationFiles))
 	}

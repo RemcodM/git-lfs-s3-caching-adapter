@@ -100,7 +100,7 @@ func (h *cachingHandler) upstreamFinished(transfer *tq.Transfer) {
 
 	if h.cacheAdapter != nil {
 		fmt.Fprintf(os.Stderr, "Adding object %s to cache\n", transfer.Oid)
-		err := h.cacheAdapter.Upload(transfer.Path, transfer.Oid, transfer.Size, nil)
+		err := h.cacheAdapter.Upload(transfer.Path, transfer.Oid, transfer.Size)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error while adding object %s to cache. %s Object is not cached for next download.\n", transfer.Oid, err.Error())
 		}

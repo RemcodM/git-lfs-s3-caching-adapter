@@ -15,11 +15,11 @@ func changeToWorkingCopy(config *config.Configuration) error {
 	workingDir := config.LocalWorkingDir()
 	cwd, err := tools.Getwd()
 	if err != nil {
-		return errors.New("Could not determine current working directory")
+		return errors.New("could not determine current working directory")
 	}
 	cwd, err = tools.CanonicalizeSystemPath(cwd)
 	if err != nil {
-		return errors.New("Could not canonicalize current working directory")
+		return errors.New("could not canonicalize current working directory")
 	}
 
 	// If the current working directory is not within the repository's
@@ -35,11 +35,11 @@ func checkOptions(options *lfs.FilterOptions) error {
 	config := GetPassthroughConfiguration()
 	if options.Local || options.Worktree {
 		if !config.InRepo() {
-			return errors.New("Not in a Git repository.")
+			return errors.New("not in a git repository")
 		}
 		bare, err := git.IsBare()
 		if err != nil {
-			return errors.New("Could not determine bareness")
+			return errors.New("could not determine bareness")
 		}
 		if !bare {
 			err = changeToWorkingCopy(config)
@@ -85,7 +85,7 @@ func cachingTransferAgentAttribute() *lfs.Attribute {
 			"path": executable,
 		},
 		Upgradeables: map[string][]string{
-			"path": []string{
+			"path": {
 				"git-lfs-s3-caching-adapter",
 			},
 		},
@@ -99,7 +99,7 @@ func standaloneCachingTransferAgentAttribute() *lfs.Attribute {
 			"standalonetransferagent": "caching",
 		},
 		Upgradeables: map[string][]string{
-			"standalonetransferagent": []string{
+			"standalonetransferagent": {
 				"caching",
 			},
 		},

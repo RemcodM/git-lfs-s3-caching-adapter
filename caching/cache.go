@@ -91,7 +91,7 @@ func (a *S3CachingAdapter) Download(dest string, oid string, size int64, progres
 	return true, nil
 }
 
-func (a *S3CachingAdapter) Upload(source string, oid string, size int64, progressCallback func(bytesSoFar int64, bytesSinceLast int64)) error {
+func (a *S3CachingAdapter) Upload(source string, oid string, size int64) error {
 	uploaded, err := a.exists(context.Background(), oid, size)
 	if uploaded && err == nil {
 		return nil
@@ -108,7 +108,7 @@ func (a *S3CachingAdapter) Upload(source string, oid string, size int64, progres
 	_, err = a.client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket: a.configuration.Bucket,
 		Key:    aws.String(fmt.Sprintf("%s/%s", *a.configuration.Prefix, oid)),
-		Body:   &progressReader{reader: file, progressCallback: progressCallback},
+		Body:   file,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to upload file to S3: %v", err)
