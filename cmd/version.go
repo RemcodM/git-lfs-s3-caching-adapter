@@ -19,10 +19,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package main
+package cmd
 
-import "gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/cmd"
+import (
+	"fmt"
 
-func main() {
-	cmd.Execute()
+	"github.com/spf13/cobra"
+)
+
+var short bool
+
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Returns the version of the Git LFS S3 caching adapter",
+	Long:  `Returns the version of the running Git LFS S3 caching adapter binary.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		version := "0.1.0"
+		if short {
+			fmt.Println(version)
+		} else {
+			fmt.Printf("Git LFS S3 caching adapter v%s\n", version)
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(versionCmd)
+
+	versionCmd.Flags().BoolVarP(&short, "short", "s", false, "Only show version of the adapter")
 }

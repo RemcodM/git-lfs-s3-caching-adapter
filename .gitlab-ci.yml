@@ -1,38 +1,124 @@
 stages:
   - build
+  - package
+  - release
+
+build:darwin:amd64:
+  stage: build
+  image: golang:1.21-alpine
+  script:
+    - GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin/amd64/git-lfs-s3-caching-adapter
+  artifacts:
+    paths:
+      - bin/darwin/amd64/git-lfs-s3-caching-adapter
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+  tags:
+    - cri
+
+build:darwin:arm64:
+  stage: build
+  image: golang:1.21-alpine
+  script:
+    - GOOS=darwin GOARCH=arm64 go build -o ./bin/darwin/arm64/git-lfs-s3-caching-adapter
+  artifacts:
+    paths:
+      - bin/darwin/arm64/git-lfs-s3-caching-adapter
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+  tags:
+    - cri
 
 build:linux:amd64:
   stage: build
   image: golang:1.21-alpine
   script:
-    - GOOS=linux GOARCH=amd64 go build -o ./bin/linux/amd64/lfscaching
+    - GOOS=linux GOARCH=amd64 go build -o ./bin/linux/amd64/git-lfs-s3-caching-adapter
   artifacts:
     paths:
-      - bin/linux/amd64/lfscaching
+      - bin/linux/amd64/git-lfs-s3-caching-adapter
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+  tags:
+    - cri
 
 build:linux:arm64:
   stage: build
   image: golang:1.21-alpine
   script:
-    - GOOS=linux GOARCH=arm64 go build -o ./bin/linux/arm64/lfscaching
+    - GOOS=linux GOARCH=arm64 go build -o ./bin/linux/arm64/git-lfs-s3-caching-adapter
   artifacts:
     paths:
-      - bin/linux/arm64/lfscaching
+      - bin/linux/arm64/git-lfs-s3-caching-adapter
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+  tags:
+    - cri
 
-build:macos:amd64:
-  stage: build
-  image: golang:1.21-alpine
+package:
+  stage: package
+  image:
+    name: helium.cr/toolbox/multitool:latest
+    entrypoint: [""]
   script:
-    - GOOS=darwin GOARCH=amd64 go build -o ./bin/macos/amd64/lfscaching
+    - if [ "$(uname -m)" == "x86_64" ]; then export ARCH='amd64'; elif [ "$(uname -m)" == "aarch64" ]; then export ARCH='arm64'; else exit 1; fi
+    - export RELEASE_VERSION=$(bin/linux/${ARCH}/git-lfs-s3-caching-adapter version --short)
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/darwin/amd64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-amd64"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/darwin/arm64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-arm64"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/linux/amd64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-amd64"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/linux/arm64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64"'
+    - printenv | grep RELEASE_ > release.env
   artifacts:
-    paths:
-      - bin/macos/amd64/lfscaching
+    reports:
+      dotenv: release.env
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: never
+    - when: manual
+  tags:
+    - cri
 
-build:macos:arm64:
-  stage: build
-  image: golang:1.21-alpine
-  script:
-    - GOOS=darwin GOARCH=arm64 go build -o ./bin/macos/arm64/lfscaching
-  artifacts:
-    paths:
-      - bin/macos/arm64/lfscaching
+release:
+  stage: release
+  image:
+    name: helium.cr/toolbox/multitool:latest
+    entrypoint: [""]
+  script: "echo Performing release of Git LFS S3 caching adapter ${RELEASE_VERSION}..."
+  release:
+    tag_name: ${RELEASE_VERSION}
+    tag_message: Git LFS S3 caching adapter ${RELEASE_VERSION}
+    name: Git LFS S3 caching adapter v${RELEASE_VERSION}
+    ref: $CI_COMMIT_SHA
+    description: 'Release version ${RELEASE_VERSION} of the Git LFS S3 caching adapter.'
+    assets:
+      links:
+        - name: macOS amd64
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-amd64"
+          filepath: /darwin/amd64/git-lfs-s3-caching-adapter
+          link_type: other
+        - name: macOS arm64
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-arm64"
+          filepath: /darwin/arm64/git-lfs-s3-caching-adapter
+          link_type: other
+        - name: linux amd64
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-amd64"
+          filepath: /linux/amd64/git-lfs-s3-caching-adapter
+          link_type: other
+        - name: linux arm64
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64"
+          filepath: /linux/arm64/git-lfs-s3-caching-adapter
+          link_type: other
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: never
+    - when: on_success
+  tags:
+    - cri

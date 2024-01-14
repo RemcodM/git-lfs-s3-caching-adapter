@@ -19,10 +19,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package main
+package cmd
 
-import "gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/cmd"
+import (
+	"fmt"
+	"os"
 
-func main() {
-	cmd.Execute()
+	"github.com/spf13/cobra"
+	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/adapter"
+)
+
+var rootCmd = &cobra.Command{
+	Use:   "git-lfs-s3-caching-adapter",
+	Short: "Standalone transfer adapter which caches Git LFS objects in a S3 bucket",
+	Long: `Git LFS S3 caching adapter is a standalone transfer adapter which caches Git
+LFS objects in a S3 bucket.
+
+It uses the underlying Git LFS implementation to perform transfers using the
+LFS configuration you set-up for your repository, but additionally caches the
+downloaded/uploaded objects in a S3 bucket you configure. This way, it is
+possbile to cache large objects at a closer edge location, possibly reducing
+download time and bandwidth costs.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		err := adapter.ProcessData(os.Stdin, os.Stdout)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(2)
+		}
+	},
 }
+
+func Execute() {
+	err := rootCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
+}
+
+func init() {}
