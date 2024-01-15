@@ -73,20 +73,21 @@ package:
     name: helium.cr/toolbox/multitool:latest
     entrypoint: [""]
   script:
+    - cd bin
     - if [ "$(uname -m)" == "x86_64" ]; then export ARCH='amd64'; elif [ "$(uname -m)" == "aarch64" ]; then export ARCH='arm64'; else exit 1; fi
-    - export RELEASE_VERSION=$(bin/linux/${ARCH}/git-lfs-s3-caching-adapter version --short)
-    - sha256sum bin/darwin/amd64/git-lfs-s3-caching-adapter | cut -d' ' -f 1 > bin/darwin/amd64/git-lfs-s3-caching-adapter.sha256
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/darwin/amd64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-amd64.sha256"'
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/darwin/amd64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-amd64"'
-    - sha256sum bin/darwin/arm64/git-lfs-s3-caching-adapter | cut -d' ' -f 1 > bin/darwin/arm64/git-lfs-s3-caching-adapter.sha256
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/darwin/arm64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-arm64.sha256"'
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/darwin/arm64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-arm64"'
-    - sha256sum bin/linux/amd64/git-lfs-s3-caching-adapter | cut -d' ' -f 1 > bin/linux/amd64/git-lfs-s3-caching-adapter.sha256
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/linux/amd64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-amd64.sha256"'
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/linux/amd64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-amd64"'
-    - sha256sum bin/linux/arm64/git-lfs-s3-caching-adapter | cut -d' ' -f 1 > bin/linux/arm64/git-lfs-s3-caching-adapter.sha256
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/linux/arm64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64.sha256"'
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "bin/linux/arm64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64"'
+    - export RELEASE_VERSION=$(linux/${ARCH}/git-lfs-s3-caching-adapter version --short)
+    - sha256sum darwin/amd64/git-lfs-s3-caching-adapter > darwin/amd64/git-lfs-s3-caching-adapter.sha256
+    - sha256sum darwin/arm64/git-lfs-s3-caching-adapter > darwin/arm64/git-lfs-s3-caching-adapter.sha256
+    - sha256sum linux/amd64/git-lfs-s3-caching-adapter > linux/amd64/git-lfs-s3-caching-adapter.sha256
+    - sha256sum linux/arm64/git-lfs-s3-caching-adapter > linux/arm64/git-lfs-s3-caching-adapter.sha256
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "darwin/amd64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-amd64.sha256"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "darwin/amd64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-amd64"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "darwin/arm64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-arm64.sha256"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "darwin/arm64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-darwin-arm64"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "linux/amd64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-amd64.sha256"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "linux/amd64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-amd64"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "linux/arm64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64.sha256"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "linux/arm64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64"'
     - printenv | grep RELEASE_ > release.env
   artifacts:
     reports:
