@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/spf13/cobra"
 	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/stats"
@@ -56,7 +57,13 @@ by the cache, but also as a way to guarantee the cache is working correctly.`,
 		}
 
 		if jsonStats {
-			cmd.Println(json.Marshal(outputStats))
+			json, err := json.Marshal(outputStats)
+			if err != nil {
+				cmd.PrintErrln(err.Error())
+				cmd.PrintErrf("warning: could not encode statistics as JSON")
+				os.Exit(1)
+			}
+			cmd.Println(string(json))
 		} else {
 			if totalStats {
 				cmd.Printf("Collected statistics since repository clone:\n\n")

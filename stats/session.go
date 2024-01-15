@@ -8,24 +8,24 @@ import (
 )
 
 type SessionStats struct {
-	name                       *string `json:"-"`
-	ObjectsPulled              uint64  `json:"objects_pulled"`
-	ObjectsPushed              uint64  `json:"objects_pushed"`
-	CacheHits                  uint64  `json:"cache_hits"`
-	CacheMisses                uint64  `json:"cache_misses"`
-	CacheErrors                uint64  `json:"cache_errors"`
-	CacheAddedDuringPull       uint64  `json:"cache_added_during_pull"`
-	CacheAddedDuringPush       uint64  `json:"cache_added_during_push"`
-	BytesTransferredFromCache  uint64  `json:"bytes_transferred_from_cache"`
-	BytesTransferredToCache    uint64  `json:"bytes_transferred_to_cache"`
-	BytesTransferredFromRemote uint64  `json:"bytes_transferred_from_remote"`
-	BytesTransferredToRemote   uint64  `json:"bytes_transferred_to_remote"`
-	Marked                     bool    `json:"marked"`
+	name                       string `json:"-"`
+	ObjectsPulled              uint64 `json:"objects_pulled"`
+	ObjectsPushed              uint64 `json:"objects_pushed"`
+	CacheHits                  uint64 `json:"cache_hits"`
+	CacheMisses                uint64 `json:"cache_misses"`
+	CacheErrors                uint64 `json:"cache_errors"`
+	CacheAddedDuringPull       uint64 `json:"cache_added_during_pull"`
+	CacheAddedDuringPush       uint64 `json:"cache_added_during_push"`
+	BytesTransferredFromCache  uint64 `json:"bytes_transferred_from_cache"`
+	BytesTransferredToCache    uint64 `json:"bytes_transferred_to_cache"`
+	BytesTransferredFromRemote uint64 `json:"bytes_transferred_from_remote"`
+	BytesTransferredToRemote   uint64 `json:"bytes_transferred_to_remote"`
+	Marked                     bool   `json:"marked"`
 }
 
 func NewSessionStats() *SessionStats {
 	return &SessionStats{
-		name:                       nil,
+		name:                       "",
 		ObjectsPulled:              0,
 		ObjectsPushed:              0,
 		CacheHits:                  0,
@@ -66,17 +66,15 @@ func (s *SessionStats) Save() error {
 		return err
 	}
 
-	name := s.name
-	if name == nil {
+	if s.name == "" {
 		suffix, err := randomHex(8)
 		if err != nil {
 			return err
 		}
-		generated_name := fmt.Sprintf("stats-%d-%s.json", time.Now().UTC().Unix(), suffix)
-		name = &generated_name
+		s.name = fmt.Sprintf("stats-%d-%s.json", time.Now().UTC().Unix(), suffix)
 	}
 
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s", cacheStoreDir, *name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(fmt.Sprintf("%s/%s", cacheStoreDir, s.name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -96,7 +94,7 @@ func (s *SessionStats) Read() error {
 		return err
 	}
 
-	file, err := os.Open(fmt.Sprintf("%s/%s", cacheStoreDir, *s.name))
+	file, err := os.Open(fmt.Sprintf("%s/%s", cacheStoreDir, s.name))
 	if err != nil {
 		return err
 	}

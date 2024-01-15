@@ -40,7 +40,13 @@ flag is set, the statistics are actually removed from the filesystem.`,
 		if len(allStats) == 0 {
 			return
 		}
-		stats.MarkAll(allStats)
+		errs = stats.MarkAll(allStats)
+		if len(errs) > 0 {
+			for _, err := range errs {
+				cmd.PrintErrln(err.Error())
+			}
+			cmd.PrintErrln("warning: some statistics could not be reset")
+		}
 	},
 }
 

@@ -52,7 +52,7 @@ func ReadAllSessionStats() ([]SessionStats, []error) {
 
 	for _, filename := range filenames {
 		statsData := SessionStats{
-			name: &filename,
+			name: filename,
 		}
 		err := statsData.Read()
 		if err != nil {
