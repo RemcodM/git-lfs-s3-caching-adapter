@@ -11,6 +11,7 @@ import (
 
 	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/caching"
 	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/lfs"
+	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/stats"
 )
 
 type cachingHandler struct {
@@ -18,9 +19,11 @@ type cachingHandler struct {
 	cacheAdapter  *caching.S3CachingAdapter
 	config        *config.Configuration
 	currentOid    *string
-	transferQueue *tq.TransferQueue
+	operation     string
 	output        *os.File
+	stats         *stats.SessionStats
 	tempdir       string
+	transferQueue *tq.TransferQueue
 }
 
 type cacheProgressHandler struct {
@@ -55,9 +58,11 @@ func newHandler(output *os.File, msg *inputMessage) (*cachingHandler, error) {
 		apiClient:     apiClient,
 		cacheAdapter:  cacheAdapter,
 		config:        cfg,
-		transferQueue: transferQueue,
+		operation:     msg.Operation,
 		output:        output,
+		stats:         stats.NewSessionStats(),
 		tempdir:       tempdir,
+		transferQueue: transferQueue,
 	}
 	progressHandler.handler = handler
 
@@ -83,7 +88,6 @@ func (h *cachingHandler) dispatch(msg *inputMessage) bool {
 	case "download":
 		h.download(msg.Oid, msg.Size)
 	case "terminate":
-		fmt.Fprintf(os.Stderr, "Received call to terminate\n")
 		h.terminate()
 		return false
 	default:
@@ -98,11 +102,29 @@ func (h *cachingHandler) upstreamFinished(transfer *tq.Transfer) {
 		return
 	}
 
+	if h.operation == "download" {
+		h.stats.ObjectsPulled++
+		h.stats.BytesTransferredFromRemote += uint64(transfer.Size)
+	} else {
+		h.stats.ObjectsPushed++
+		h.stats.BytesTransferredToRemote += uint64(transfer.Size)
+	}
+
 	if h.cacheAdapter != nil {
 		fmt.Fprintf(os.Stderr, "Adding object %s to cache\n", transfer.Oid)
-		err := h.cacheAdapter.Upload(transfer.Path, transfer.Oid, transfer.Size)
-		if err != nil {
+		uploaded, err := h.cacheAdapter.Upload(transfer.Path, transfer.Oid, transfer.Size)
+		if uploaded {
+			if h.operation == "download" {
+				h.stats.CacheAddedDuringPull++
+			} else {
+				h.stats.CacheAddedDuringPush++
+			}
+			h.stats.BytesTransferredToCache += uint64(transfer.Size)
+			fmt.Fprintf(os.Stderr, "Added object %s to cache\n", transfer.Oid)
+		} else if err != nil {
 			fmt.Fprintf(os.Stderr, "Error while adding object %s to cache. %s Object is not cached for next download.\n", transfer.Oid, err.Error())
+		} else {
+			fmt.Fprintf(os.Stderr, "Object %s is already in cache\n", transfer.Oid)
 		}
 	}
 
@@ -110,6 +132,11 @@ func (h *cachingHandler) upstreamFinished(transfer *tq.Transfer) {
 }
 
 func (h *cachingHandler) terminate() {
+	fmt.Fprintf(os.Stderr, "Received call to terminate, writing stats\n")
+	err := h.stats.Save()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed writing stats, ignoring...\n")
+	}
 	h.apiClient.Close()
 }
 
@@ -160,12 +187,17 @@ func (h *cachingHandler) download(oid string, size int64) {
 			h.progress(oid, bytesSoFar, bytesSinceLast)
 		})
 		if ok {
+			h.stats.ObjectsPulled++
+			h.stats.CacheHits++
+			h.stats.BytesTransferredFromCache += uint64(size)
 			fmt.Fprintf(os.Stderr, "Downloaded object %s from cache to target %s\n", oid, tmp.Name())
 			h.complete(oid, tmp.Name(), err)
 			return
 		} else if err == nil {
+			h.stats.CacheMisses++
 			fmt.Fprintf(os.Stderr, "Cache miss for object %s. Will download upstream instead.\n", oid)
 		} else {
+			h.stats.CacheErrors++
 			fmt.Fprintf(os.Stderr, "Cache error while obtaining object %s. %s Will download upstream instead.\n", oid, err.Error())
 		}
 	}

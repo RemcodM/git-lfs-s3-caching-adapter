@@ -91,16 +91,16 @@ func (a *S3CachingAdapter) Download(dest string, oid string, size int64, progres
 	return true, nil
 }
 
-func (a *S3CachingAdapter) Upload(source string, oid string, size int64) error {
+func (a *S3CachingAdapter) Upload(source string, oid string, size int64) (bool, error) {
 	uploaded, err := a.exists(context.Background(), oid, size)
 	if uploaded && err == nil {
-		return nil
+		return false, nil
 	}
 
 	// Open the source file
 	file, err := os.Open(source)
 	if err != nil {
-		return fmt.Errorf("failed to open source file: %v", err)
+		return false, fmt.Errorf("failed to open source file: %v", err)
 	}
 	defer file.Close()
 
@@ -111,8 +111,8 @@ func (a *S3CachingAdapter) Upload(source string, oid string, size int64) error {
 		Body:   file,
 	})
 	if err != nil {
-		return fmt.Errorf("failed to upload file to S3: %v", err)
+		return false, fmt.Errorf("failed to upload file to S3: %v", err)
 	}
 
-	return nil
+	return true, nil
 }
