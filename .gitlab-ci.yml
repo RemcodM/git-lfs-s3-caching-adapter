@@ -88,6 +88,7 @@ package:
     - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "linux/amd64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-amd64"'
     - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "linux/arm64/git-lfs-s3-caching-adapter.sha256" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64.sha256"'
     - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "linux/arm64/git-lfs-s3-caching-adapter" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/git-lfs-s3-caching-adapter/${RELEASE_VERSION}/git-lfs-s3-caching-adapter-linux-arm64"'
+    - cd ..
     - printenv | grep RELEASE_ > release.env
   artifacts:
     reports:
