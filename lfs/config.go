@@ -43,9 +43,19 @@ func (e *passthroughEnvironment) Bool(key string, def bool) bool {
 }
 
 func (e *passthroughEnvironment) Int(key string, def int) int {
+	if key == "lfs.concurrenttransfers" {
+		fmt.Fprintf(os.Stderr, "Call to read %s, intercepting and returning 1\n", key)
+		return 1
+	}
 	return e.environment.Int(key, def)
 }
 
 func (e *passthroughEnvironment) All() map[string][]string {
 	return e.environment.All()
+}
+
+func GetPassthroughConfiguration() *config.Configuration {
+	config := config.New()
+	config.Git = newPassthroughEnvironment(config.Git)
+	return config
 }
