@@ -179,6 +179,10 @@ release:github:
           "bin/linux/arm64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-linux-arm64"
           "bin/linux/arm64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-linux-arm64.sha256"
   needs:
+    - build:darwin:amd64
+    - build:darwin:arm64
+    - build:linux:amd64
+    - build:linux:arm64
     - package
     - release:gitlab
   rules:
