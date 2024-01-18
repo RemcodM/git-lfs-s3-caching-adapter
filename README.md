@@ -132,3 +132,5 @@ This way, Git LFS will print tracing output to the terminal when performing the 
 
 ## Uninstallation
 Ensure to remove any relevant configuration flags from your Git configuration or `.lfsconfig` file. Then run `git-lfs-s3-caching-adapter uninstall` to remove the adapter from your global `.gitconfig` file. Optionally, you can also uninstall it in the system config file, your worktree or even locally. See `git-lfs-s3-caching-adapter uninstall --help` for more details.
+
+After uninstalling the configuration, you can simply remove the binary from your `PATH` or your system.
