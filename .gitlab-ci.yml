@@ -91,6 +91,9 @@ package:
     - cd ..
     - printenv | grep RELEASE_ > release.env
   artifacts:
+    expire_in: 2 hours
+    paths:
+      - bin/**/*.sha256
     reports:
       dotenv: release.env
   rules:
@@ -100,12 +103,39 @@ package:
   tags:
     - cri
 
-release:
+release:github:
   stage: release
   image:
     name: helium.cr/toolbox/multitool:latest
     entrypoint: [""]
-  script: "echo Performing release of Git LFS S3 caching adapter ${RELEASE_VERSION}..."
+  script:
+    - "echo Performing release of Git LFS S3 caching adapter ${RELEASE_VERSION} to GitHub..."
+    - >
+        gh release create "${RELEASE_VERSION}"
+          --notes "Release version ${RELEASE_VERSION} of the Git LFS S3 caching adapter."
+          --title "Git LFS S3 caching adapter v${RELEASE_VERSION}"
+          --repo "RemcodM/git-lfs-s3-caching-adapter"
+          "bin/darwin/amd64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-darwin-amd64"
+          "bin/darwin/amd64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-darwin-amd64.sha256"
+          "bin/darwin/arm64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-darwin-arm64"
+          "bin/darwin/arm64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-darwin-arm64.sha256"
+          "bin/linux/amd64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-linux-amd64"
+          "bin/linux/amd64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-linux-amd64.sha256"
+          "bin/linux/arm64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-linux-arm64"
+          "bin/linux/arm64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-linux-arm64.sha256"
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: never
+    - when: on_success
+  tags:
+    - cri
+
+release:gitlab:
+  stage: release
+  image:
+    name: helium.cr/toolbox/multitool:latest
+    entrypoint: [""]
+  script: "echo Performing release of Git LFS S3 caching adapter ${RELEASE_VERSION} to HeliumNet GitLab..."
   release:
     tag_name: ${RELEASE_VERSION}
     tag_message: Git LFS S3 caching adapter ${RELEASE_VERSION}

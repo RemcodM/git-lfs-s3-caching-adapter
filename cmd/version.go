@@ -34,7 +34,7 @@ var versionCmd = &cobra.Command{
 	Short: "Returns the version of the Git LFS S3 caching adapter",
 	Long:  `Returns the version of the running Git LFS S3 caching adapter binary.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		version := "0.5.0"
+		version := "0.5.1"
 		if short {
 			fmt.Println(version)
 		} else {
