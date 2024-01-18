@@ -165,18 +165,18 @@ release:github:
     - "echo Performing release of Git LFS S3 caching adapter ${RELEASE_VERSION} to GitHub..."
     - git remote add github git@github.com:RemcodM/git-lfs-s3-caching-adapter.git
     - >
-        gh release create "${RELEASE_VERSION}"
-          --notes "Release version ${RELEASE_VERSION} of the Git LFS S3 caching adapter."
-          --title "Git LFS S3 caching adapter v${RELEASE_VERSION}"
-          --repo "RemcodM/git-lfs-s3-caching-adapter"
-          --verify-tag
-          "bin/darwin/amd64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-darwin-amd64"
-          "bin/darwin/amd64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-darwin-amd64.sha256"
-          "bin/darwin/arm64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-darwin-arm64"
-          "bin/darwin/arm64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-darwin-arm64.sha256"
-          "bin/linux/amd64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-linux-amd64"
-          "bin/linux/amd64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-linux-amd64.sha256"
-          "bin/linux/arm64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-linux-arm64"
+        gh release create "${RELEASE_VERSION}" \
+          --notes "Release version ${RELEASE_VERSION} of the Git LFS S3 caching adapter." \
+          --title "Git LFS S3 caching adapter v${RELEASE_VERSION}" \
+          --repo "RemcodM/git-lfs-s3-caching-adapter" \
+          --verify-tag \
+          "bin/darwin/amd64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-darwin-amd64" \
+          "bin/darwin/amd64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-darwin-amd64.sha256" \
+          "bin/darwin/arm64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-darwin-arm64" \
+          "bin/darwin/arm64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-darwin-arm64.sha256" \
+          "bin/linux/amd64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-linux-amd64" \
+          "bin/linux/amd64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-linux-amd64.sha256" \
+          "bin/linux/arm64/git-lfs-s3-caching-adapter#git-lfs-s3-caching-adapter-linux-arm64" \
           "bin/linux/arm64/git-lfs-s3-caching-adapter.sha256#git-lfs-s3-caching-adapter-linux-arm64.sha256"
   needs:
     - build:darwin:amd64
@@ -188,6 +188,7 @@ release:github:
   rules:
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
       when: never
-    - when: on_success
+    - when: delayed
+      start_in: 15 minutes
   tags:
     - cri
