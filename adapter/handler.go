@@ -17,7 +17,7 @@ type cachingHandler struct {
 	cacheAdapter *caching.S3CachingAdapter
 	client       *lfs.LFSTransferClient
 	output       *os.File
-	stats        *stats.SessionStats
+	stats        *stats.Stats
 	tempdir      string
 }
 

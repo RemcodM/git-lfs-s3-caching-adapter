@@ -29,6 +29,8 @@ import (
 	"gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/adapter"
 )
 
+var verbose bool
+
 var rootCmd = &cobra.Command{
 	Use:   "git-lfs-s3-caching-adapter",
 	Short: "Standalone transfer adapter which caches Git LFS objects in a S3 bucket",
@@ -57,4 +59,6 @@ func Execute() {
 	}
 }
 
-func init() {}
+func init() {
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
+}

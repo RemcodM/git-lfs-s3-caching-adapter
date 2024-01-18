@@ -29,7 +29,8 @@ flag is set, the statistics are actually removed from the filesystem.`,
 			os.Exit(1)
 		}
 
-		allStats, errs := stats.ReadAllSessionStats()
+		code := 0
+		allStats, errs := stats.ReadAllStats()
 		if len(errs) > 0 {
 			for _, err := range errs {
 				cmd.PrintErrln(err.Error())
@@ -37,21 +38,31 @@ flag is set, the statistics are actually removed from the filesystem.`,
 			cmd.PrintErrln("warning: some statistics could not be read")
 		}
 
-		if len(allStats) == 0 {
+		compactedStats, ok := compact(cmd, allStats, true)
+		if !ok {
+			code = 1
+		}
+
+		if len(compactedStats) == 0 {
 			return
 		}
-		errs = stats.MarkAll(allStats)
+		errs = stats.MarkAll(compactedStats)
 		if len(errs) > 0 {
 			for _, err := range errs {
 				cmd.PrintErrln(err.Error())
 			}
 			cmd.PrintErrln("warning: some statistics could not be reset")
 		}
+		if verbose {
+			cmd.Printf("Marked %d statistics object(s) as reset\n", len(compactedStats))
+		}
+		os.Exit(code)
 	},
 }
 
 func init() {
 	statsCmd.AddCommand(resetCmd)
 
+	resetCmd.Flags().BoolVarP(&skipCompact, "no-compact", "C", false, "Do not automatically compact statistics during reset")
 	resetCmd.Flags().BoolVarP(&purgeStats, "purge", "p", false, "Actually remove all statistics, instead of marking them as reset")
 }

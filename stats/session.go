@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type SessionStats struct {
+type Stats struct {
 	name                       string `json:"-"`
 	ObjectsPulled              uint64 `json:"objects_pulled"`
 	ObjectsPushed              uint64 `json:"objects_pushed"`
@@ -20,11 +20,12 @@ type SessionStats struct {
 	BytesTransferredToCache    uint64 `json:"bytes_transferred_to_cache"`
 	BytesTransferredFromRemote uint64 `json:"bytes_transferred_from_remote"`
 	BytesTransferredToRemote   uint64 `json:"bytes_transferred_to_remote"`
+	Sessions                   uint64 `json:"sessions"`
 	Marked                     bool   `json:"marked"`
 }
 
-func NewSessionStats() *SessionStats {
-	return &SessionStats{
+func newStats() *Stats {
+	return &Stats{
 		name:                       "",
 		ObjectsPulled:              0,
 		ObjectsPushed:              0,
@@ -37,11 +38,27 @@ func NewSessionStats() *SessionStats {
 		BytesTransferredToCache:    0,
 		BytesTransferredFromRemote: 0,
 		BytesTransferredToRemote:   0,
+		Sessions:                   0,
 		Marked:                     false,
 	}
 }
 
-func (s *SessionStats) Add(other *SessionStats) {
+func NewSessionStats() *Stats {
+	stats := newStats()
+	stats.Sessions = 1
+	return stats
+}
+
+func NewCollectedStats() (*Stats, error) {
+	stats := newStats()
+	err := stats.generateName("collected-stats")
+	if err != nil {
+		return nil, err
+	}
+	return stats, nil
+}
+
+func (s *Stats) Add(other *Stats) {
 	s.ObjectsPulled += other.ObjectsPulled
 	s.ObjectsPushed += other.ObjectsPushed
 	s.CacheHits += other.CacheHits
@@ -53,25 +70,40 @@ func (s *SessionStats) Add(other *SessionStats) {
 	s.BytesTransferredToCache += other.BytesTransferredToCache
 	s.BytesTransferredFromRemote += other.BytesTransferredFromRemote
 	s.BytesTransferredToRemote += other.BytesTransferredToRemote
+	s.Sessions += other.Sessions
 }
 
-func (s *SessionStats) Mark() error {
+func (s *Stats) IsZero() bool {
+	return s.ObjectsPulled == 0 &&
+		s.ObjectsPushed == 0 &&
+		s.CacheHits == 0 &&
+		s.CacheMisses == 0 &&
+		s.CacheErrors == 0 &&
+		s.CacheAddedDuringPull == 0 &&
+		s.CacheAddedDuringPush == 0 &&
+		s.BytesTransferredFromCache == 0 &&
+		s.BytesTransferredToCache == 0 &&
+		s.BytesTransferredFromRemote == 0 &&
+		s.BytesTransferredToRemote == 0 &&
+		s.Sessions == 0
+}
+
+func (s *Stats) Mark() error {
 	s.Marked = true
 	return s.Save()
 }
 
-func (s *SessionStats) Save() error {
+func (s *Stats) Save() error {
 	cacheStoreDir, err := requireCacheStoreDirectory()
 	if err != nil {
 		return err
 	}
 
 	if s.name == "" {
-		suffix, err := randomHex(8)
+		err := s.generateName("stats")
 		if err != nil {
 			return err
 		}
-		s.name = fmt.Sprintf("stats-%d-%s.json", time.Now().UTC().Unix(), suffix)
 	}
 
 	file, err := os.OpenFile(fmt.Sprintf("%s/%s", cacheStoreDir, s.name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
@@ -88,7 +120,7 @@ func (s *SessionStats) Save() error {
 	return nil
 }
 
-func (s *SessionStats) Read() error {
+func (s *Stats) Read() error {
 	cacheStoreDir, err := requireCacheStoreDirectory()
 	if err != nil {
 		return err
@@ -105,5 +137,27 @@ func (s *SessionStats) Read() error {
 		return err
 	}
 
+	return nil
+}
+
+func (s *Stats) Delete() error {
+	cacheStoreDir, err := requireCacheStoreDirectory()
+	if err != nil {
+		return err
+	}
+
+	if s.name == "" {
+		return fmt.Errorf("cannot delete stats without a name")
+	}
+
+	return os.Remove(fmt.Sprintf("%s/%s", cacheStoreDir, s.name))
+}
+
+func (s *Stats) generateName(prefix string) error {
+	suffix, err := randomHex(8)
+	if err != nil {
+		return err
+	}
+	s.name = fmt.Sprintf("%s-%d-%s.json", prefix, time.Now().UTC().Unix(), suffix)
 	return nil
 }

@@ -2,28 +2,66 @@ package stats
 
 import "os"
 
-func TotalStats(stats []SessionStats) *SessionStats {
-	totalStats := NewSessionStats()
+func CollectedStats(stats []Stats) (*Stats, error) {
+	totalStats, err := NewCollectedStats()
+	if err != nil {
+		return nil, err
+	}
 	for _, stat := range stats {
 		totalStats.Add(&stat)
 	}
-	return totalStats
+	return totalStats, nil
 }
 
-func UnmarkedStats(stats []SessionStats) *SessionStats {
-	unmarkedStats := NewSessionStats()
+func Compact(stats []Stats) (*Stats, []error) {
+	collectedStats, err := CollectedStats(stats)
+	if err != nil {
+		return nil, []error{err}
+	}
+	if !collectedStats.IsZero() {
+		err := collectedStats.Save()
+		if err != nil {
+			return collectedStats, []error{err}
+		}
+	}
+	return collectedStats, Purge(stats)
+}
+
+func MarkAll(stats []Stats) []error {
+	var errors []error
+	for _, stat := range stats {
+		err := stat.Mark()
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return errors
+}
+
+func FilterMarked(stats []Stats) []Stats {
+	var markedStats []Stats
+	for _, stat := range stats {
+		if stat.Marked {
+			markedStats = append(markedStats, stat)
+		}
+	}
+	return markedStats
+}
+
+func FilterUnmarked(stats []Stats) []Stats {
+	var unmarkedStats []Stats
 	for _, stat := range stats {
 		if !stat.Marked {
-			unmarkedStats.Add(&stat)
+			unmarkedStats = append(unmarkedStats, stat)
 		}
 	}
 	return unmarkedStats
 }
 
-func MarkAll(stats []SessionStats) []error {
+func Purge(stats []Stats) []error {
 	var errors []error
 	for _, stat := range stats {
-		err := stat.Mark()
+		err := stat.Delete()
 		if err != nil {
 			errors = append(errors, err)
 		}
@@ -41,18 +79,19 @@ func PurgeAll() error {
 	return nil
 }
 
-func ReadAllSessionStats() ([]SessionStats, []error) {
+func ReadAllStats() ([]Stats, []error) {
 	filenames, err := allStatsFiles()
 	if err != nil {
 		return nil, []error{err}
 	}
 
-	var stats []SessionStats
+	var stats []Stats
 	var errors []error
 
 	for _, filename := range filenames {
-		statsData := SessionStats{
-			name: filename,
+		statsData := Stats{
+			name:     filename,
+			Sessions: 1, // Default to 1 session, as this is the default for older stats files
 		}
 		err := statsData.Read()
 		if err != nil {

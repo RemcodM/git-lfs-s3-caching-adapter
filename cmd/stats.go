@@ -32,16 +32,22 @@ import (
 var (
 	jsonStats  = false
 	totalStats = false
+	siUnits    = false
 )
 
 var statsCmd = &cobra.Command{
 	Use:   "stats",
 	Short: "Show statistics collected for the current repository",
-	Long: `Show various statistics collected for the current repository by the various runs
-of the caching adapter. These can be used to gain insight in the amount of bandwidth saved
-by the cache, but also as a way to guarantee the cache is working correctly.`,
+	Long: `Show various statistics collected for the current repository by the various
+sessions of the caching adapter. These can be used to gain insight in the amount
+of bandwidth saved by the cache, but also as a way to guarantee the cache is
+working correctly.
+
+Please note that when concurrency for the caching adapter is enabled in Git LFS, one
+LFS command will result in multiple sessions of the caching adapter, thus resulting
+in multiple statistics entries.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		allStats, errs := stats.ReadAllSessionStats()
+		allStats, errs := stats.ReadAllStats()
 		if len(errs) > 0 {
 			for _, err := range errs {
 				cmd.PrintErrln(err.Error())
@@ -49,26 +55,38 @@ by the cache, but also as a way to guarantee the cache is working correctly.`,
 			cmd.PrintErrf("warning: some statistics could not be read\n\n")
 		}
 
-		var outputStats *stats.SessionStats
+		unmarkedStats, _ := compact(cmd, stats.FilterUnmarked(allStats), true)
+
+		var outputStats *stats.Stats
+		var err error
 		if totalStats {
-			outputStats = stats.TotalStats(allStats)
+			outputStats, err = stats.CollectedStats(allStats)
 		} else {
-			outputStats = stats.UnmarkedStats(allStats)
+			outputStats, err = stats.CollectedStats(unmarkedStats)
+		}
+		if err != nil {
+			cmd.PrintErrln(err.Error())
+			cmd.PrintErrf("warning: could not collect statistics\n")
+			os.Exit(1)
 		}
 
 		if jsonStats {
 			json, err := json.Marshal(outputStats)
 			if err != nil {
 				cmd.PrintErrln(err.Error())
-				cmd.PrintErrf("warning: could not encode statistics as JSON")
+				cmd.PrintErrf("warning: could not encode statistics as JSON\n")
 				os.Exit(1)
 			}
 			cmd.Println(string(json))
 		} else {
+			byteFormatFunc := stats.ByteCountIEC
+			if siUnits {
+				byteFormatFunc = stats.ByteCountSI
+			}
 			if totalStats {
-				cmd.Printf("Collected statistics since repository clone:\n\n")
+				cmd.Printf("Collected statistics for %d sessions since repository clone:\n\n", outputStats.Sessions)
 			} else {
-				cmd.Printf("Collected statistics:\n\n")
+				cmd.Printf("Collected statistics for %d sessions:\n\n", outputStats.Sessions)
 			}
 			cmd.Printf("Objects pulled:                %d\n", outputStats.ObjectsPulled)
 			cmd.Printf("  Cache hits:                  %d (%s)\n", outputStats.CacheHits, stats.Percentage(outputStats.CacheHits, outputStats.ObjectsPulled))
@@ -79,10 +97,10 @@ by the cache, but also as a way to guarantee the cache is working correctly.`,
 			cmd.Printf("Objects pushed:                %d\n", outputStats.ObjectsPushed)
 			cmd.Printf("  Cache additions during push: %d (%s)\n\n", outputStats.CacheAddedDuringPush, stats.Percentage(outputStats.CacheAddedDuringPush, outputStats.ObjectsPushed))
 
-			cmd.Printf("Bytes downloaded from remote:  %s\n", stats.ByteCountIEC(outputStats.BytesTransferredFromRemote))
-			cmd.Printf("Bytes downloaded from cache:   %s\n", stats.ByteCountIEC(outputStats.BytesTransferredFromCache))
-			cmd.Printf("Bytes uploaded to remote:      %s\n", stats.ByteCountIEC(outputStats.BytesTransferredToRemote))
-			cmd.Printf("Bytes uploaded to cache:       %s\n", stats.ByteCountIEC(outputStats.BytesTransferredToCache))
+			cmd.Printf("Bytes downloaded from remote:  %s\n", byteFormatFunc(outputStats.BytesTransferredFromRemote))
+			cmd.Printf("Bytes downloaded from cache:   %s\n", byteFormatFunc(outputStats.BytesTransferredFromCache))
+			cmd.Printf("Bytes uploaded to remote:      %s\n", byteFormatFunc(outputStats.BytesTransferredToRemote))
+			cmd.Printf("Bytes uploaded to cache:       %s\n", byteFormatFunc(outputStats.BytesTransferredToCache))
 		}
 	},
 }
@@ -90,6 +108,8 @@ by the cache, but also as a way to guarantee the cache is working correctly.`,
 func init() {
 	rootCmd.AddCommand(statsCmd)
 
+	statsCmd.Flags().BoolVarP(&skipCompact, "no-compact", "C", false, "Do not automatically compact statistics")
 	statsCmd.Flags().BoolVarP(&jsonStats, "json", "j", false, "Use machine readable JSON output format for the statistics")
+	statsCmd.Flags().BoolVarP(&siUnits, "si", "s", false, "Use SI units when printing statistics (e.g. 1000 bytes = 1kb), instead of IEC units. This only affects the human readable output format")
 	statsCmd.Flags().BoolVarP(&totalStats, "total", "t", false, "Export total statistics for this repository, not only the statistics since last reset")
 }
