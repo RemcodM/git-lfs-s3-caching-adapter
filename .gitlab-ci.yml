@@ -163,6 +163,7 @@ release:github:
     entrypoint: [""]
   script:
     - "echo Performing release of Git LFS S3 caching adapter ${RELEASE_VERSION} to GitHub..."
+    - git remote add github git@github.com:RemcodM/git-lfs-s3-caching-adapter.git
     - >
         gh release create "${RELEASE_VERSION}"
           --notes "Release version ${RELEASE_VERSION} of the Git LFS S3 caching adapter."
