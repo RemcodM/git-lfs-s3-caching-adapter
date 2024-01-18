@@ -1,4 +1,6 @@
 # Git LFS S3 caching adapter
+[![pipeline status](https://gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/badges/main/pipeline.svg)](https://gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/-/commits/main) 
+[![Latest Release](https://gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/-/badges/release.svg)](https://gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter/-/releases) 
 
 The Git LFS S3 caching adapter is an implementation of a [Git LFS custom transfer agent](https://github.com/git-lfs/git-lfs/blob/main/docs/custom-transfers.md) that has as a goal to add S3 bucket caching to existing LFS implementations. This could prove useful if bandwidth to the main LFS storage is expensive (because of metering or fysical distance to the data).
 
