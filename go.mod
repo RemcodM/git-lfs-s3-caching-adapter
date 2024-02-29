@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.1
 	github.com/aws/smithy-go v1.20.1
-	github.com/git-lfs/git-lfs/v3 v3.4.1
+	github.com/git-lfs/git-lfs/v3 v3.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.8.0
 )
@@ -42,6 +42,7 @@ require (
 	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
+	github.com/jmhodges/clock v1.2.0 // indirect
 	github.com/leonelquinteros/gotext v1.5.2 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/olekukonko/ts v0.0.0-20171002115256-78ecb04241c0 // indirect
