@@ -5,7 +5,7 @@ stages:
 
 build:darwin:amd64:
   stage: build
-  image: golang:1.22-alpine
+  image: golang:1.23-alpine
   script:
     - GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin/amd64/git-lfs-s3-caching-adapter
   artifacts:
@@ -21,7 +21,7 @@ build:darwin:amd64:
 
 build:darwin:arm64:
   stage: build
-  image: golang:1.22-alpine
+  image: golang:1.23-alpine
   script:
     - GOOS=darwin GOARCH=arm64 go build -o ./bin/darwin/arm64/git-lfs-s3-caching-adapter
   artifacts:
@@ -37,7 +37,7 @@ build:darwin:arm64:
 
 build:linux:amd64:
   stage: build
-  image: golang:1.22-alpine
+  image: golang:1.23-alpine
   script:
     - GOOS=linux GOARCH=amd64 go build -o ./bin/linux/amd64/git-lfs-s3-caching-adapter
   artifacts:
@@ -53,7 +53,7 @@ build:linux:amd64:
 
 build:linux:arm64:
   stage: build
-  image: golang:1.22-alpine
+  image: golang:1.23-alpine
   script:
     - GOOS=linux GOARCH=arm64 go build -o ./bin/linux/arm64/git-lfs-s3-caching-adapter
   artifacts:
