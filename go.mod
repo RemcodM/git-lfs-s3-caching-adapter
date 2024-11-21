@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.28.5
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.67.1
 	github.com/aws/smithy-go v1.22.1
-	github.com/git-lfs/git-lfs/v3 v3.5.1
+	github.com/git-lfs/git-lfs/v3 v3.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.8.1
 )
@@ -49,8 +49,8 @@ require (
 	github.com/rubyist/tracerx v0.0.0-20170927163412-787959303086 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 )
