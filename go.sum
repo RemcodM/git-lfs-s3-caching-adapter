@@ -1082,6 +1082,8 @@ github.com/git-lfs/git-lfs/v3 v3.5.1 h1:ZkJiL+FKV/OG+oeT2jp/Ml3rtEYLf9fWZY8ciVvn
 github.com/git-lfs/git-lfs/v3 v3.5.1/go.mod h1:7ZGqapa386yliCQPShbckL/WF4+V/OCtLHj0FkM60jk=
 github.com/git-lfs/git-lfs/v3 v3.6.0 h1:GRHy8MvXkEHJHWfSUXJl9pDwxcWhuMREzRomevAs3I4=
 github.com/git-lfs/git-lfs/v3 v3.6.0/go.mod h1:1YO3nafGw2wKBR5LTZ7/LXJ7U7ELdvIGvcCBrLt6mfM=
+github.com/git-lfs/git-lfs/v3 v3.6.1 h1:0RA2HzkMVl69KE5zCGY1PxqkDSbd/f/O7Du6CNkTYtY=
+github.com/git-lfs/git-lfs/v3 v3.6.1/go.mod h1:1YO3nafGw2wKBR5LTZ7/LXJ7U7ELdvIGvcCBrLt6mfM=
 github.com/git-lfs/gitobj/v2 v2.1.1 h1:tf/VU6zL1kxa3he+nf6FO/syX+LGkm6WGDsMpfuXV7Q=
 github.com/git-lfs/gitobj/v2 v2.1.1/go.mod h1:q6aqxl6Uu3gWsip5GEKpw+7459F97er8COmU45ncAxw=
 github.com/git-lfs/go-netrc v0.0.0-20230601124202-e96144b9a966 h1:BzL3hPg4P3jGkLEVu2yaPdHGFXfphEs6eJwJ/LSUXYk=
