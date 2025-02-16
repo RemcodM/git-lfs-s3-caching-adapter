@@ -9,7 +9,7 @@ require (
 	github.com/aws/smithy-go v1.22.2
 	github.com/git-lfs/git-lfs/v3 v3.6.1
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.0
 )
 
 require (
@@ -47,7 +47,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/olekukonko/ts v0.0.0-20171002115256-78ecb04241c0 // indirect
 	github.com/rubyist/tracerx v0.0.0-20170927163412-787959303086 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/net v0.23.0 // indirect
