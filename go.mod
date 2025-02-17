@@ -9,7 +9,7 @@ require (
 	github.com/aws/smithy-go v1.22.2
 	github.com/git-lfs/git-lfs/v3 v3.6.1
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.9.0
+	github.com/spf13/cobra v1.9.1
 )
 
 require (
