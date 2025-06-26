@@ -1,6 +1,6 @@
 module gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter
 
-go 1.22
+go 1.23.0
 
 toolchain go1.24.4
 
@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.29.17
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.82.0
 	github.com/aws/smithy-go v1.22.4
-	github.com/git-lfs/git-lfs/v3 v3.6.1
+	github.com/git-lfs/git-lfs/v3 v3.7.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.9.1
 )
@@ -33,9 +33,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.34.0 // indirect
 	github.com/dpotapov/go-spnego v0.0.0-20220426193508-b7f82e4507db // indirect
 	github.com/git-lfs/gitobj/v2 v2.1.1 // indirect
-	github.com/git-lfs/go-netrc v0.0.0-20230601124202-e96144b9a966 // indirect
+	github.com/git-lfs/go-netrc v0.0.0-20250218165306-ba0029b43d11 // indirect
 	github.com/git-lfs/pktline v0.0.0-20230103162542-ca444d533ef1 // indirect
 	github.com/git-lfs/wildmatch/v2 v2.0.1 // indirect
+	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
@@ -51,8 +52,8 @@ require (
 	github.com/rubyist/tracerx v0.0.0-20170927163412-787959303086 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
-	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 )
