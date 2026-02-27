@@ -1,6 +1,6 @@
 module gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter
 
-go 1.23.0
+go 1.24
 
 toolchain go1.26.0
 
@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.2
 	github.com/aws/aws-sdk-go-v2/config v1.32.10
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.96.2
-	github.com/aws/smithy-go v1.24.1
+	github.com/aws/smithy-go v1.24.2
 	github.com/git-lfs/git-lfs/v3 v3.7.1
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.10.2
