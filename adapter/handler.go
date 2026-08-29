@@ -30,10 +30,7 @@ func newHandler(output *os.File, msg *inputMessage) (*cachingHandler, error) {
 		return nil, err
 	}
 
-	client, err := lfs.NewLFSTransferClient(config, msg.Operation, msg.Remote)
-	if err != nil {
-		return nil, err
-	}
+	client := lfs.NewLFSTransferClient(config, msg.Operation, msg.Remote)
 
 	cacheAdapter, err := caching.NewS3CachingAdapter(config)
 	if err != nil {

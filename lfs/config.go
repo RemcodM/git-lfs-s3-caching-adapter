@@ -50,6 +50,10 @@ func (e *passthroughEnvironment) Int(key string, def int) int {
 	return e.environment.Int(key, def)
 }
 
+func (e *passthroughEnvironment) Int64(key string, def int64) int64 {
+	return e.environment.Int64(key, def)
+}
+
 func (e *passthroughEnvironment) All() map[string][]string {
 	return e.environment.All()
 }
