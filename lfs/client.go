@@ -16,18 +16,15 @@ type LFSTransferClient struct {
 	remote    string
 }
 
-func NewLFSTransferClient(cfg *config.Configuration, operation string, remote string) (*LFSTransferClient, error) {
-	client, err := getAPIClient(cfg)
-	if err != nil {
-		return nil, err
-	}
+func NewLFSTransferClient(cfg *config.Configuration, operation string, remote string) *LFSTransferClient {
+	client := getAPIClient(cfg)
 	return &LFSTransferClient{
 		config:    cfg,
 		lfsClient: client,
 		manifest:  getManifest(cfg, client, operation, remote),
 		operation: operation,
 		remote:    remote,
-	}, nil
+	}
 }
 
 func (c *LFSTransferClient) NewTransferQueue(progressCallback tools.CopyCallback) *tq.TransferQueue {
@@ -69,7 +66,7 @@ func getManifest(cfg *config.Configuration, client *lfsapi.Client, operation str
 	return tq.NewManifest(cfg.Filesystem(), client, operation, remote)
 }
 
-func getAPIClient(cfg *config.Configuration) (*lfsapi.Client, error) {
+func getAPIClient(cfg *config.Configuration) *lfsapi.Client {
 	return lfsapi.NewClient(cfg)
 }
 
