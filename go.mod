@@ -1,6 +1,6 @@
 module gitlab.heliumnet.nl/toolbox/git-lfs-s3-caching-adapter
 
-go 1.24
+go 1.25.0
 
 toolchain go1.27.0
 
@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.33.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.109.1
 	github.com/aws/smithy-go v1.28.1
-	github.com/git-lfs/git-lfs/v3 v3.7.1
+	github.com/git-lfs/git-lfs/v3 v3.8.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.10.2
 )
@@ -47,14 +47,15 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jmhodges/clock v1.2.0 // indirect
-	github.com/leonelquinteros/gotext v1.5.2 // indirect
-	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/klauspost/compress v1.19.1 // indirect
+	github.com/leonelquinteros/gotext v1.7.2 // indirect
+	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/olekukonko/ts v0.0.0-20171002115256-78ecb04241c0 // indirect
 	github.com/rubyist/tracerx v0.0.0-20170927163412-787959303086 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/crypto v0.54.0 // indirect
+	golang.org/x/net v0.57.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 )
